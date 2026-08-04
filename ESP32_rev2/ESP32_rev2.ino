@@ -55,9 +55,12 @@ const uint16_t DISCOVERY_PORT = 42100;
 const uint16_t Port = 54732; // Port that the godot server uses
 bool connected = false;
 
+void setup_AP(){
+
+}
+
 //I2C com with IMU board
-void setup_IMU()
-{
+void setup_IMU(){
     servoLeft.attach(27);
     servoRight.attach(14);
     servoLeft.write(90);

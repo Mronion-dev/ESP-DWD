@@ -42,8 +42,8 @@ using namespace websockets;
 
 WebsocketsClient client;
 
-char* ssid = ""; // left blank for privacy purposes and for upcoming captive portal feature
-char* password = "";
+const char* ssid = ""; // left blank for privacy purposes and for upcoming captive portal feature
+const char* password = "";
 const uint16_t Port = 54732; // Port that the godot server uses
 bool connected = false;
 
