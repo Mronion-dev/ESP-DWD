@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://bj5x8hd4cftm1"]
+
+[ext_resource type="Script" uid="uid://vxara2ga34q6" path="res://Scripts/3d_sim.gd" id="1_5fdy5"]
+[ext_resource type="PackedScene" uid="uid://cdbdotldokbn8" path="res://Double Wobble.glb" id="2_gl45v"]
+
+[node name="3D-Sim" type="Node3D" unique_id=1688245637]
+script = ExtResource("1_5fdy5")
+
+[node name="aaaa" type="CharacterBody3D" parent="." unique_id=1282535575]
+
+[node name="Node3D" type="Node3D" parent="aaaa" unique_id=55835993]
+
+[node name="Tinkercad GLTF Scene" parent="aaaa" unique_id=1802052423 instance=ExtResource("2_gl45v")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+rotation_edit_mode = 1
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1543733426]
+transform = Transform3D(0.049415797, -0.326544, 0.9438894, 0, 0.9450439, 0.32694343, -0.9987783, -0.01615617, 0.046700098, 2.3163939, 0.95272326, 0.075509965)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=2145462399]
+transform = Transform3D(0.92215264, -0.3811481, -0.06603658, 0.3179809, 0.6496915, 0.69049925, -0.22027907, -0.657744, 0.7203125, 0, 18.831633, 20.060757)
+light_color = Color(0.8474515, 0, 0.45545793, 1)
+light_energy = 16.0
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1337607483]
+transform = Transform3D(1, 0, 0, 0, 0.98282623, -0.18453375, 0, 0.18453375, 0.98282623, 0.12841702, 2.681352, -0.2055099)
+light_color = Color(0.28028405, 0.5480923, 1, 1)
+light_size = 1.0

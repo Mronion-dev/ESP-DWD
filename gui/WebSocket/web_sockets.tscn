@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bh6akmgchmtir"]
+
+[ext_resource type="Script" uid="uid://dushofx88ixt" path="res://WebSocket/WebSocketServer.gd" id="1_7omr3"]
+
+[node name="WebSockets" type="Node" unique_id=254373463]
+script = ExtResource("1_7omr3")
+
+[node name="Timer" type="Timer" parent="." unique_id=364874485]
+wait_time = 0.05
+
+[connection signal="timeout" from="Timer" to="." method="Send_Rate"]

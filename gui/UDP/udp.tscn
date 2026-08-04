@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cbuuo6vddow11"]
+
+[ext_resource type="Script" uid="uid://06bfpgf0lsgc" path="res://UDP/Discovery.gd" id="1_1pq1w"]
+
+[node name="UDP" type="Node" unique_id=1781758248]
+script = ExtResource("1_1pq1w")

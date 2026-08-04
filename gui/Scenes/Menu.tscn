@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://jjpnil12o2dv"]
+
+[ext_resource type="FontFile" uid="uid://dbrwlbu1s7lua" path="res://Assets/Silkscreen/Silkscreen-Regular.ttf" id="1_3kf3n"]
+[ext_resource type="Script" uid="uid://c45j1svtnoqy7" path="res://Scripts/menu.gd" id="1_6pedr"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_6yyo6"]
+font = ExtResource("1_3kf3n")
+font_size = 64
+font_color = Color(0.15686275, 0.15686275, 0.16862746, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_dnola"]
+font = ExtResource("1_3kf3n")
+font_size = 24
+
+[node name="Menu" type="Control" unique_id=2041047866]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6pedr")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1198876477]
+layout_mode = 0
+offset_left = 660.0
+offset_top = 140.0
+offset_right = 1260.0
+offset_bottom = 940.0
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=25329787]
+layout_mode = 2
+text = "DWD-C"
+label_settings = SubResource("LabelSettings_6yyo6")
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="VBoxContainer" unique_id=427526672]
+layout_mode = 2
+text = "Lovely day we are having"
+label_settings = SubResource("LabelSettings_dnola")
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="VBoxContainer" unique_id=6503219]
+layout_mode = 2
+text = "MAin tab"
+
+[node name="Button2" type="Button" parent="VBoxContainer" unique_id=1654458459]
+layout_mode = 2
+text = "initialize your esp32"
+
+[connection signal="pressed" from="VBoxContainer/Button" to="." method="go_to_networking"]
+[connection signal="pressed" from="VBoxContainer/Button2" to="." method="go_to_captive_portal"]

@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://dnqqrjt88oyjc"]
+
+[ext_resource type="Script" uid="uid://5gellln6cmxe" path="res://Scripts/Captive_portal.gd" id="1_bm7go"]
+
+[node name="CP" type="Control" unique_id=706739234]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bm7go")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1238167783]
+layout_mode = 0
+offset_left = 480.0
+offset_top = 100.0
+offset_right = 1440.0
+offset_bottom = 338.0
+
+[node name="LineEdit" type="LineEdit" parent="CenterContainer" unique_id=689348963]
+layout_mode = 2
+placeholder_text = "Your ESP's ID (eg. the ef21 in drone-ef21)"
+alignment = 1
+expand_to_text_length = true
+
+[node name="CenterContainer2" type="CenterContainer" parent="." unique_id=1989463539]
+layout_mode = 0
+offset_left = 480.0
+offset_top = 250.0
+offset_right = 1440.0
+offset_bottom = 488.0
+
+[node name="LineEdit" type="LineEdit" parent="CenterContainer2" unique_id=704250309]
+layout_mode = 2
+placeholder_text = "your wifi's name"
+alignment = 1
+expand_to_text_length = true
+
+[node name="CenterContainer3" type="CenterContainer" parent="." unique_id=1637185117]
+layout_mode = 0
+offset_left = 480.0
+offset_top = 397.0
+offset_right = 1440.0
+offset_bottom = 635.0
+
+[node name="LineEdit" type="LineEdit" parent="CenterContainer3" unique_id=1935598007]
+layout_mode = 2
+placeholder_text = "your wifi's Password"
+alignment = 1
+max_length = 64
+expand_to_text_length = true
+secret = true
+secret_character = "^"

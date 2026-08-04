@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="WifiManager" inherits="Node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Cross-platform Wi-Fi scan, connect, disconnect, and connectivity monitoring.
+	</brief_description>
+	<description>
+		[WifiManager] is the main GDExtension node for WifiGD. Add it to your scene tree or register [code]wifi_manager_autoload.tscn[/code] as an autoload singleton to scan for networks, connect to open or WPA2-PSK networks, disconnect, and read adapter and connectivity state.
+		Blocking methods run on a worker thread pool where possible; prefer the [code]*_async[/code] variants and signals during gameplay.
+		[b]Supported platforms:[/b] Windows (WLAN API), Linux (NetworkManager / libnm). macOS is stubbed.
+		[b]WifiNetwork dictionary[/b] fields in scan results:
+		[codeblock lang=text]
+		ssid            — Network name
+		bssid           — Access point MAC address
+		signal_strength — Normalized signal 0–100
+		is_secured      — Whether a password is required
+		is_connected    — Whether this AP is the active association
+		security_type   — e.g. open, wpa2, connected
+		frequency_mhz   — Center frequency when available
+		channel         — Wi-Fi channel when available
+		band            — e.g. 2.4, 5, 6
+		adapter_id      — Adapter that observed this network
+		[/codeblock]
+		[b]NetworkAdapter dictionary[/b] fields:
+		[codeblock lang=text]
+		id           — Platform adapter id (Windows GUID, Linux wlan0, etc.)
+		name         — Friendly interface name
+		description  — Optional description
+		mac_address  — Hardware MAC
+		ip_address   — Current IPv4 when assigned
+		gateway      — Default gateway when known
+		dns_primary  — Primary DNS when known
+		type         — wifi, ethernet, virtual, other, unknown
+		is_up        — Administratively up
+		is_connected — Has an active link
+		[/codeblock]
+		[b]Connectivity dictionary[/b] fields:
+		[codeblock lang=text]
+		state             — disconnected, connecting, connected, failed
+		is_wifi_connected — Associated with Wi-Fi
+		connected_ssid    — Active SSID
+		local_ip          — Assigned IPv4
+		gateway           — Default gateway
+		dns_primary       — Primary DNS
+		has_internet      — Best-effort reachability hint
+		[/codeblock]
+		[b]WifiRadioState dictionary[/b] (from [method get_wifi_radio_state]):
+		[codeblock lang=text]
+		enabled           — Effective radio on (matches [method is_wifi_enabled])
+		software_enabled  — OS/software Wi-Fi toggle (NM WirelessEnabled on Linux)
+		hardware_enabled  — Hardware rfkill not blocking (NM WirelessHardwareEnabled on Linux)
+		can_toggle        — UI hint: true when hardware is not rfkill-blocked
+		permission        — Linux polkit hint: yes, auth, no, or unknown (informational)
+		[/codeblock]
+		[b]Wi-Fi radio:[/b] Prefer [method set_wifi_enabled_async] and [signal wifi_radio_set_completed] during gameplay. On Linux, WifiGD always attempts the NetworkManager toggle and reports success when the radio state actually changes (no sudo required when NM allows it for the session user). [code]permission[/code] is a hint only — Godot cannot show polkit dialogs, so [code]auth[/code] may still fail without a desktop polkit agent.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="is_wifi_enabled">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the Wi-Fi radio is effectively on. On Linux this is the software toggle [b]and[/b] hardware not rfkill-blocked (same as [code]enabled[/code] in [method get_wifi_radio_state]). Updated by internal polling and after successful radio changes.
+			</description>
+		</method>
+		<method name="set_wifi_enabled">
+			<return type="bool" />
+			<param index="0" name="enabled" type="bool">
+				Desired radio state.
+			</param>
+			<description>
+				[b]Synchronous.[/b] Enables or disables the Wi-Fi radio and blocks until the OS request completes (up to ~30s on Linux). May require administrator privileges on Windows or polkit / elevation on Linux. Returns [code]false[/code] on failure; see [method get_last_error]. Does not emit [signal wifi_radio_set_completed] — use [method set_wifi_enabled_async] for signal-based UI. On success, [signal wifi_enabled_changed] is emitted when polling detects the new state.
+			</description>
+		</method>
+		<method name="set_wifi_enabled_async">
+			<return type="void" />
+			<param index="0" name="enabled" type="bool">
+				Desired radio state.
+			</param>
+			<description>
+				Starts an asynchronous Wi-Fi radio enable/disable on a worker thread. Result arrives via [signal wifi_radio_set_completed]. Only one radio operation runs at a time; a second call while busy emits [signal wifi_radio_set_completed] with [code]ERR_BUSY[/code]. On Linux, requires NetworkManager and polkit permission [code]enable-disable-wifi[/code]; Godot cannot show polkit authorization dialogs — configure policy or run elevated if toggles fail without a desktop polkit agent.
+			</description>
+		</method>
+		<method name="get_wifi_radio_state">
+			<return type="Dictionary" />
+			<description>
+				Returns a [b]WifiRadioState[/b] dictionary (see class description): [code]enabled[/code], [code]software_enabled[/code], [code]hardware_enabled[/code], [code]can_toggle[/code], and [code]permission[/code] ([code]yes[/code], [code]auth[/code], [code]no[/code], or [code]unknown[/code]). Use to decide whether to show or disable a Wi-Fi radio switch before calling [method set_wifi_enabled_async].
+			</description>
+		</method>
+		<method name="scan_wifi_networks">
+			<return type="Array" />
+			<param index="0" name="adapter_id" type="String" default="&quot;&quot;">
+				Target adapter, or empty for the default Wi-Fi adapter.
+			</param>
+			<description>
+				[b]Synchronous.[/b] Scans for nearby networks and blocks until complete. Prefer [method scan_wifi_networks_async] on the main thread during gameplay.
+			</description>
+		</method>
+		<method name="scan_wifi_networks_async">
+			<return type="void" />
+			<param index="0" name="adapter_id" type="String" default="&quot;&quot;">
+				Target adapter, or empty for the default Wi-Fi adapter.
+			</param>
+			<description>
+				Starts an asynchronous scan. Results arrive via [signal scan_completed].
+			</description>
+		</method>
+		<method name="connect_to_wifi">
+			<return type="int" enum="Error" />
+			<param index="0" name="ssid" type="String">
+				Network SSID.
+			</param>
+			<param index="1" name="password" type="String" default="&quot;&quot;">
+				WPA2-PSK password; leave empty for open networks.
+			</param>
+			<param index="2" name="adapter_id" type="String" default="&quot;&quot;">
+				Target adapter, or empty for the default Wi-Fi adapter.
+			</param>
+			<description>
+				[b]Synchronous.[/b] Connects to a network and blocks until the request finishes. Prefer [method connect_to_wifi_async].
+			</description>
+		</method>
+		<method name="connect_to_wifi_async">
+			<return type="void" />
+			<param index="0" name="ssid" type="String">
+				Network SSID.
+			</param>
+			<param index="1" name="password" type="String" default="&quot;&quot;">
+				WPA2-PSK password; leave empty for open networks.
+			</param>
+			<param index="2" name="adapter_id" type="String" default="&quot;&quot;">
+				Target adapter, or empty for the default Wi-Fi adapter.
+			</param>
+			<description>
+				Starts an asynchronous connect. Result arrives via [signal connect_completed].
+			</description>
+		</method>
+		<method name="disconnect_from_wifi">
+			<return type="int" enum="Error" />
+			<param index="0" name="adapter_id" type="String" default="&quot;&quot;">
+				Target adapter, or empty for the default Wi-Fi adapter.
+			</param>
+			<description>
+				[b]Synchronous.[/b] Disconnects from the current Wi-Fi network. Prefer [method disconnect_from_wifi_async].
+			</description>
+		</method>
+		<method name="disconnect_from_wifi_async">
+			<return type="void" />
+			<param index="0" name="adapter_id" type="String" default="&quot;&quot;">
+				Target adapter, or empty for the default Wi-Fi adapter.
+			</param>
+			<description>
+				Starts an asynchronous disconnect. Result arrives via [signal disconnect_completed].
+			</description>
+		</method>
+		<method name="get_connectivity_info">
+			<return type="Dictionary" />
+			<description>
+				Returns a fresh connectivity snapshot (see class description for fields).
+			</description>
+		</method>
+		<method name="get_cached_connectivity">
+			<return type="Dictionary" />
+			<description>
+				Returns the last cached connectivity snapshot updated by internal polling (~every 2 seconds).
+			</description>
+		</method>
+		<method name="get_connection_state">
+			<return type="int" />
+			<description>
+				Returns the cached connection state constant: [constant DISCONNECTED], [constant CONNECTING], [constant CONNECTED], or [constant FAILED].
+			</description>
+		</method>
+		<method name="get_network_adapters">
+			<return type="Array" />
+			<description>
+				[b]Synchronous.[/b] Returns the current list of network adapters.
+			</description>
+		</method>
+		<method name="get_cached_adapters">
+			<return type="Array" />
+			<description>
+				Returns the last cached adapter list.
+			</description>
+		</method>
+		<method name="fetch_adapters_async">
+			<return type="void" />
+			<description>
+				Refreshes adapters asynchronously. Result arrives via [signal adapters_updated].
+			</description>
+		</method>
+		<method name="get_last_error">
+			<return type="String" />
+			<description>
+				Returns a short, user-facing message for the last failure. Detailed OS errors are also logged to the Godot Output panel.
+			</description>
+		</method>
+	</methods>
+	<members>
+	</members>
+	<signals>
+		<signal name="scan_completed">
+			<param index="0" name="networks" type="Array">
+				Array of WifiNetwork dictionaries.
+			</param>
+			<param index="1" name="error" type="int">
+				Godot [enum Error] code.
+			</param>
+			<param index="2" name="message" type="String">
+				Friendly status or error text for UI logs.
+			</param>
+			<description>
+				Emitted when [method scan_wifi_networks_async] finishes.
+			</description>
+		</signal>
+		<signal name="connect_completed">
+			<param index="0" name="error" type="int">
+				Godot [enum Error] code.
+			</param>
+			<param index="1" name="message" type="String">
+				Friendly status or error text.
+			</param>
+			<description>
+				Emitted when [method connect_to_wifi_async] finishes.
+			</description>
+		</signal>
+		<signal name="disconnect_completed">
+			<param index="0" name="error" type="int">
+				Godot [enum Error] code.
+			</param>
+			<param index="1" name="message" type="String">
+				Friendly status or error text.
+			</param>
+			<description>
+				Emitted when [method disconnect_from_wifi_async] finishes.
+			</description>
+		</signal>
+		<signal name="adapters_updated">
+			<param index="0" name="adapters" type="Array">
+				Array of NetworkAdapter dictionaries.
+			</param>
+			<param index="1" name="error" type="int">
+				Godot [enum Error] code.
+			</param>
+			<param index="2" name="message" type="String">
+				Friendly status or error text.
+			</param>
+			<description>
+				Emitted when [method fetch_adapters_async] finishes.
+			</description>
+		</signal>
+		<signal name="connectivity_changed">
+			<param index="0" name="info" type="Dictionary">
+				Connectivity snapshot; see class description.
+			</param>
+			<description>
+				Emitted when connectivity state changes (polled automatically while the node is in the tree).
+			</description>
+		</signal>
+		<signal name="connection_state_changed">
+			<param index="0" name="state" type="int">
+				One of [constant DISCONNECTED], [constant CONNECTING], [constant CONNECTED], [constant FAILED].
+			</param>
+			<param index="1" name="ssid" type="String">
+				Active SSID, or empty when disconnected.
+			</param>
+			<description>
+				Emitted when connection state or active SSID changes.
+			</description>
+		</signal>
+		<signal name="wifi_enabled_changed">
+			<param index="0" name="enabled" type="bool">
+				New effective radio enabled state.
+			</param>
+			<description>
+				Emitted when the effective Wi-Fi radio state changes (polled automatically ~every 2 seconds while the node is in the tree, and after a successful async toggle). Matches [method is_wifi_enabled] / [code]enabled[/code] in [method get_wifi_radio_state].
+			</description>
+		</signal>
+		<signal name="wifi_radio_set_completed">
+			<param index="0" name="error" type="int">
+				Godot [enum Error] code ([code]OK[/code] on success, [code]ERR_CANT_CONNECT[/code] on OS failure, [code]ERR_BUSY[/code] if another radio change is in progress).
+			</param>
+			<param index="1" name="message" type="String">
+				Friendly status or error text for UI logs.
+			</param>
+			<description>
+				Emitted when [method set_wifi_enabled_async] finishes. Check [code]error == OK[/code] before syncing UI; on failure [code]message[/code] often indicates polkit denial, rfkill, or timeout. Does not fire for [method set_wifi_enabled] (sync).
+			</description>
+		</signal>
+	</signals>
+	<constants>
+		<constant name="DISCONNECTED" value="0">
+			Not connected to Wi-Fi.
+		</constant>
+		<constant name="CONNECTING" value="1">
+			Association or DHCP in progress.
+		</constant>
+		<constant name="CONNECTED" value="2">
+			Connected and associated.
+		</constant>
+		<constant name="FAILED" value="3">
+			Connection attempt failed.
+		</constant>
+	</constants>
+</class>
