@@ -18,7 +18,6 @@ ill fill it in later
 
 ### Notes
 
-- Controller side ESP32 is included in the drone parts
 - signal interference sucks, just manage your cables man
 - capacitors are recommended (47uF 6V+) but not needed
 
@@ -56,7 +55,7 @@ If you wish to use any part of this project commercially, contact me, MO-D, for 
 ## Contributing
 
 - Suggestions, improvements, and custom 3D designs are welcome. If you develop better parts, enclosures, or software enhancements, consider sharing them so others can benefit.
-- Donations will soon be up but you dont really need to donate, donating helps me bring out more designs, open source software AND hardware
+- Donations unfortunately wont be available due to the shitty country I live in >:(
 - Discord link: https://discord.gg/kGYJnFMWCF
 
 ---
