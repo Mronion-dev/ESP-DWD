@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://cdbdotldokbn8"
-path="res://.godot/imported/Double Wobble.glb-aaeeb1c7806af923783a80c9e08319d4.scn"
+path="res://.godot/imported/Double Wobble.glb-6f443d760c49a8212712a14cded2c3af.scn"
 
 [deps]
 
-source_file="res://Double Wobble.glb"
-dest_files=["res://.godot/imported/Double Wobble.glb-aaeeb1c7806af923783a80c9e08319d4.scn"]
+source_file="res://Assets/Double Wobble.glb"
+dest_files=["res://.godot/imported/Double Wobble.glb-6f443d760c49a8212712a14cded2c3af.scn"]
 
 [params]
 

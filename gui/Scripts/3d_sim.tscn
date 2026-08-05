@@ -1,16 +1,16 @@
 [gd_scene format=3 uid="uid://bj5x8hd4cftm1"]
 
-[ext_resource type="Script" uid="uid://vxara2ga34q6" path="res://Scripts/3d_sim.gd" id="1_5fdy5"]
-[ext_resource type="PackedScene" uid="uid://cdbdotldokbn8" path="res://Double Wobble.glb" id="2_gl45v"]
+[ext_resource type="Script" uid="uid://vxara2ga34q6" path="res://Scripts/3d_sim.gd" id="1_3t3wq"]
+[ext_resource type="PackedScene" uid="uid://cdbdotldokbn8" path="res://Assets/Double Wobble.glb" id="2_05osm"]
 
 [node name="3D-Sim" type="Node3D" unique_id=1688245637]
-script = ExtResource("1_5fdy5")
+script = ExtResource("1_3t3wq")
 
 [node name="aaaa" type="CharacterBody3D" parent="." unique_id=1282535575]
 
 [node name="Node3D" type="Node3D" parent="aaaa" unique_id=55835993]
 
-[node name="Tinkercad GLTF Scene" parent="aaaa" unique_id=1802052423 instance=ExtResource("2_gl45v")]
+[node name="Tinkercad GLTF Scene" parent="aaaa" unique_id=1802052423 instance=ExtResource("2_05osm")]
 transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
 rotation_edit_mode = 1
 

@@ -18,9 +18,9 @@ offset_top = 100.0
 offset_right = 1440.0
 offset_bottom = 338.0
 
-[node name="LineEdit" type="LineEdit" parent="CenterContainer" unique_id=689348963]
+[node name="LineEdit" type="LineEdit" parent="CenterContainer" unique_id=704250309]
 layout_mode = 2
-placeholder_text = "Your ESP's ID (eg. the ef21 in drone-ef21)"
+placeholder_text = "your wifi's name"
 alignment = 1
 expand_to_text_length = true
 
@@ -31,11 +31,14 @@ offset_top = 250.0
 offset_right = 1440.0
 offset_bottom = 488.0
 
-[node name="LineEdit" type="LineEdit" parent="CenterContainer2" unique_id=704250309]
+[node name="LineEdit" type="LineEdit" parent="CenterContainer2" unique_id=1935598007]
 layout_mode = 2
-placeholder_text = "your wifi's name"
+placeholder_text = "your wifi's Password"
 alignment = 1
+max_length = 64
 expand_to_text_length = true
+secret = true
+secret_character = "^"
 
 [node name="CenterContainer3" type="CenterContainer" parent="." unique_id=1637185117]
 layout_mode = 0
@@ -44,11 +47,20 @@ offset_top = 397.0
 offset_right = 1440.0
 offset_bottom = 635.0
 
-[node name="LineEdit" type="LineEdit" parent="CenterContainer3" unique_id=1935598007]
+[node name="Connect" type="Button" parent="CenterContainer3" unique_id=1698507263]
 layout_mode = 2
-placeholder_text = "your wifi's Password"
-alignment = 1
-max_length = 64
-expand_to_text_length = true
-secret = true
-secret_character = "^"
+text = "Connect your esp"
+
+[node name="Label" type="Label" parent="." unique_id=2069135557]
+layout_mode = 0
+offset_left = 336.0
+offset_top = -1.0
+offset_right = 1604.0
+offset_bottom = 40.0
+theme_override_colors/font_color = Color(1, 0.007843138, 0, 1)
+text = "!!MAKE SURE YOU CONNECT TO YOUR ESP'S WIFI for this to work!!"
+horizontal_alignment = 1
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1238089720]
+
+[connection signal="pressed" from="CenterContainer3/Connect" to="." method="_on_connect_pressed"]

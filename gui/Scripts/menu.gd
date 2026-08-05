@@ -5,4 +5,4 @@ func go_to_networking() -> void:
 
 
 func go_to_captive_portal() -> void:
-	pass # ill do some hsit later
+	get_tree().change_scene_to_file("res://Scenes/captive_portal.tscn")

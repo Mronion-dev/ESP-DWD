@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Drone"
-run/main_scene="res://Scenes/Main.tscn"
+run/main_scene="uid://jjpnil12o2dv"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
 

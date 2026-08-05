@@ -122,5 +122,7 @@ func Inputs():
 		var thrust = Input.get_axis("I", "K")
 		target[1] = steer
 		target[3] = thrust
-	pass
-	
+
+func Send_Custom(text : String):
+	if connectable:
+		_peers[last_peer_id].send_text(text)
