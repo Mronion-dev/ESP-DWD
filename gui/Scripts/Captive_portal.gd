@@ -7,3 +7,7 @@ func _on_connect_pressed() -> void:
 	var url = "http://192.168.4.1/send?str1=" + value1.uri_encode() + "&str2=" + value2.uri_encode()
 	
 	$HTTPRequest.request(url)
+
+
+func leave() -> void:
+	get_tree().change_scene_to_file("res://Scenes/Menu.tscn")

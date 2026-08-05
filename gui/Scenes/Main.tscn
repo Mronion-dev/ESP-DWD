@@ -88,7 +88,7 @@ custom_minimum_size = Vector2(260, 0)
 custom_maximum_size = Vector2(260, -1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
-text = "Stop Server"
+text = "Restart ESP"
 
 [node name="LOG_LAST" type="Label" parent="VBoxContainer" unique_id=1598011227]
 layout_mode = 2
@@ -121,6 +121,16 @@ placeholder_text = "Throttle Incremental Speed (int > 0)"
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 
+[node name="LeaveContainer" type="CenterContainer" parent="VBoxContainer" unique_id=400880263]
+layout_mode = 2
+
+[node name="Restart" type="Button" parent="VBoxContainer/LeaveContainer" unique_id=1329181194]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "quit to menu"
+
 [node name="Timer" type="Timer" parent="." unique_id=1314471664]
 wait_time = 0.1
 autostart = true
@@ -134,4 +144,5 @@ script = ExtResource("2_idj7w")
 [connection signal="pressed" from="VBoxContainer/RestartConatiner/Restart" to="." method="Restart_ESP"]
 [connection signal="pressed" from="VBoxContainer/CenterContainer/Button" to="." method="eed"]
 [connection signal="text_submitted" from="VBoxContainer/LineEdit" to="." method="yes"]
+[connection signal="pressed" from="VBoxContainer/LeaveContainer/Restart" to="." method="quit_to_menu"]
 [connection signal="timeout" from="Timer" to="." method="process_packet"]

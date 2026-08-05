@@ -39,7 +39,7 @@ func process_packet():
 	$VBoxContainer/Label2.text = str(Websocket.TGthrust , Websocket.TGroll , Websocket.TGyaw , Websocket.throttle)
 	$VBoxContainer/Label3.text = "throttle += input * speed * delta"
 func eed() -> void:
-	get_tree().change_scene_to_file("res://3d_sim.tscn")
+	get_tree().change_scene_to_file("res://Scenes/3d_sim.tscn")
 
 
 func method_(toggled_on: bool) -> void:
@@ -57,3 +57,8 @@ func Restart_ESP() -> void:
 	if Websocket.connectable:
 		Websocket._peers[Websocket.last_peer_id].send_text("rest")
 		UDP.start()
+
+
+func quit_to_menu() -> void:
+	Disconnect()
+	get_tree().change_scene_to_file("res://Scenes/Menu.tscn")

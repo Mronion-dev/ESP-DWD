@@ -49,9 +49,6 @@ Preferences preferences;
 using namespace websockets;
 WebsocketsClient client;
 
-char* ssid = ""; 
-char* password = "";
-
 WiFiUDP udp;
 
 const uint16_t DISCOVERY_PORT = 42100;
@@ -59,49 +56,57 @@ const uint16_t DISCOVERY_PORT = 42100;
 const uint16_t Port = 54732; // Port that the godot server uses
 bool connected = false;
 
-WebServer server(80);
+WebServer HTTPserver(80);
 
 void save(String SSID, String PASS, bool OK) {
     preferences.begin("wifi", false);
 
     preferences.putString("SSID", SSID);
     preferences.putString("PASS", PASS);
-    preferences.putBool("OK", OK)
+    preferences.putBool("OK", OK);
 
     preferences.end();
+}
+
+bool Ok = true;
 
 void handleSend() {
-    if (server.hasArg("str1") && server.hasArg("str2")) {
-        String message = server.arg("str1");
-        String message2 = server.arg("str2");
+    if (HTTPserver.hasArg("str1") && HTTPserver.hasArg("str2")) {
+        String message = HTTPserver.arg("str1");
+        String message2 = HTTPserver.arg("str2");
 
         Serial.print("Received SSID: ");
         Serial.println(message);
         Serial.print("Recieved Password:");
         Serial.println(message2);
         save(message,message2,true);
-        ESP.restart();
 
-        server.send(200, "text/plain", "Received: " + message);
+        HTTPserver.send(200, "text/plain", "Received: " + message);
+        Ok = false;
     } else {
-        server.send(400, "text/plain", "Missing msg parameter");
+        HTTPserver.send(400, "text/plain", "Missing msg parameter");
         save("","",false);
+        Ok = true;
     }
 }
 
 void setup_AP() {
+    // Identifier
+    String mac = WiFi.macAddress();
 
+    String last4 = mac.substring(mac.length() - 5);
+    last4.replace(":", "");
     // Start Wi-Fi access point
-    WiFi.softAP(ssid, password);
+    WiFi.softAP(("Hobby Drone" + last4).c_str(), "12345678");
 
     Serial.println("AP started");
     Serial.print("IP address: ");
     Serial.println(WiFi.softAPIP());
 
     // HTTP endpoint
-    server.on("/send", handleSend);
+    HTTPserver.on("/send", handleSend);
 
-    server.begin();
+    HTTPserver.begin();
 
     Serial.println("HTTP server started");
 }
@@ -175,8 +180,6 @@ IPAddress discoverServer(uint32_t timeout = 3000)
 
 bool connect_to_server()
 {
-    Serial.print("Connecting to WebSocket server: ");
-    Serial.println(server);
 
     if (client.connect(discoverServer().toString(), Port, "/"))
     {
@@ -289,23 +292,36 @@ void calibrateGyro() //creates a bias to subtract from the imu values, reduce sh
 }
 
 //This runs when the ESP32 boots
+
 void setup() {
-  SPI.begin(18, 19, 23, 5);
-  matrix.begin();
-  matrix.control(MD_MAX72XX::INTENSITY, 5);
-  matrix.clear();
-  Serial.begin(115200);
-  preferences.begin("wifi", true);
-  ssid = preferences.getString("SSID", "");
-  password = preferences.getString("PASS", "");
-  if (preferences.getBool("OK",false) == false){
-    setup_AP();
-    while(true){
-      handleSend();
+    SPI.begin(18, 19, 23, 5);
+
+    matrix.begin();
+    matrix.control(MD_MAX72XX::INTENSITY, 5);
+    matrix.clear();
+
+    Serial.begin(115200);
+
+    preferences.begin("wifi", true);
+
+    String ssid = preferences.getString("SSID", "");
+    String password = preferences.getString("PASS", "");
+    bool ok = preferences.getBool("OK", false);
+
+    preferences.end();
+
+    if (!ok) {
+        setup_AP();
+
+        while (Ok) {
+            HTTPserver.handleClient();
+        }
+
+        Serial.println("Eat shit");
+        ESP.restart();
     }
-  }
-  preferences.end()
-  WiFi.begin(ssid, password);
+
+    WiFi.begin(ssid.c_str(), password.c_str());
 
   uint32_t lastAnimation = 0;
   int i;
@@ -331,6 +347,7 @@ void setup() {
       ESP.restart();
     }
   }
+  pinMode(15, INPUT_PULLUP);
   matrix.clear();
   Draw_Check();
   delay(100);
@@ -408,9 +425,14 @@ int t = 0;
 int angle = 0;
 
 void loop() {
-  if(connected == false) {
-    return;
-  }
+    if(connected == false) {
+      return;
+    }
+    if(digitalRead(15) == LOW){
+      Serial.println("reseting physically");
+      save("","",false);
+      ESP.restart();
+    }
     uint32_t now = micros();
     delta = (now - lastTime) / 1000000.0f;
     lastTime = now;
