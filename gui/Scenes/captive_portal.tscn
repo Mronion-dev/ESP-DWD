@@ -1,75 +1,148 @@
 [gd_scene format=3 uid="uid://dnqqrjt88oyjc"]
 
-[ext_resource type="Script" uid="uid://5gellln6cmxe" path="res://Scripts/Captive_portal.gd" id="1_bm7go"]
+[ext_resource type="Script" uid="uid://c5q7ixogivglv" path="res://Scripts/Main.gd" id="1_gbrcj"]
+[ext_resource type="Script" uid="uid://dd1nmmjk1p64w" path="res://Scenes/character_body_2d.gd" id="2_5qn5x"]
 
-[node name="CP" type="Control" unique_id=706739234]
+[sub_resource type="LabelSettings" id="LabelSettings_6yyo6"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_dnola"]
+font_size = 32
+
+[node name="Control" type="Control" unique_id=2043189975]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_bm7go")
+script = ExtResource("1_gbrcj")
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1238167783]
+[node name="LiveVideo" type="CenterContainer" parent="." unique_id=872869492]
 layout_mode = 0
-offset_left = 480.0
-offset_top = 100.0
-offset_right = 1440.0
-offset_bottom = 338.0
+offset_right = 1280.0
+offset_bottom = 720.0
 
-[node name="LineEdit" type="LineEdit" parent="CenterContainer" unique_id=704250309]
+[node name="ColorRect" type="ColorRect" parent="LiveVideo" unique_id=342755644]
+custom_minimum_size = Vector2(1280, 720)
 layout_mode = 2
-placeholder_text = "your wifi's name"
-alignment = 1
-expand_to_text_length = true
+color = Color(0, 0, 0, 1)
 
-[node name="CenterContainer2" type="CenterContainer" parent="." unique_id=1989463539]
-layout_mode = 0
-offset_left = 480.0
-offset_top = 250.0
-offset_right = 1440.0
-offset_bottom = 488.0
-
-[node name="LineEdit" type="LineEdit" parent="CenterContainer2" unique_id=1935598007]
+[node name="Label" type="Label" parent="LiveVideo" unique_id=1164516536]
 layout_mode = 2
-placeholder_text = "your wifi's Password"
-alignment = 1
-max_length = 64
-expand_to_text_length = true
-secret = true
-secret_character = "^"
+theme_override_font_sizes/font_size = 32
+text = "Live Video Feed will be Displayed here"
 
-[node name="CenterContainer3" type="CenterContainer" parent="." unique_id=1637185117]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=812366602]
 layout_mode = 0
-offset_left = 480.0
-offset_top = 397.0
-offset_right = 1440.0
-offset_bottom = 635.0
+offset_left = 1300.0
+offset_top = 20.0
+offset_right = 1900.0
+offset_bottom = 720.0
+offset_transform_enabled = true
+accessibility_region = true
 
-[node name="Connect" type="Button" parent="CenterContainer3" unique_id=1698507263]
+[node name="MainLabel" type="Label" parent="VBoxContainer" unique_id=284449276]
 layout_mode = 2
-text = "Connect your esp"
-
-[node name="Label" type="Label" parent="." unique_id=2069135557]
-layout_mode = 0
-offset_left = 336.0
-offset_top = -1.0
-offset_right = 1604.0
-offset_bottom = 40.0
-theme_override_colors/font_color = Color(1, 0.007843138, 0, 1)
-text = "!!MAKE SURE YOU CONNECT TO YOUR ESP'S WIFI for this to work!!"
+text = "Networking Information"
+label_settings = SubResource("LabelSettings_6yyo6")
 horizontal_alignment = 1
 
-[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1238089720]
+[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer" unique_id=2009549101]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+offset_transform_enabled = true
 
-[node name="Connect" type="Button" parent="." unique_id=176079095]
-layout_mode = 0
-offset_left = 1442.0
-offset_top = 952.0
-offset_right = 1826.0
-offset_bottom = 1009.0
-text = "back to menu"
+[node name="CheckBox" type="CheckBox" parent="VBoxContainer/CenterContainer2" unique_id=1068130443]
+custom_minimum_size = Vector2(300, 64)
+layout_mode = 2
+text = "Use Controller"
+icon_alignment = 2
+expand_icon = true
 
-[connection signal="pressed" from="CenterContainer3/Connect" to="." method="_on_connect_pressed"]
-[connection signal="pressed" from="Connect" to="." method="leave"]
+[node name="ConnectContainer" type="CenterContainer" parent="VBoxContainer" unique_id=1470112807]
+layout_mode = 2
+
+[node name="Connect" type="Button" parent="VBoxContainer/ConnectContainer" unique_id=2142073138]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Start Server"
+
+[node name="DisconnectContainer" type="CenterContainer" parent="VBoxContainer" unique_id=747881956]
+layout_mode = 2
+
+[node name="Disconnect" type="Button" parent="VBoxContainer/DisconnectContainer" unique_id=179641153]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Stop Server"
+
+[node name="RestartConatiner" type="CenterContainer" parent="VBoxContainer" unique_id=770270331]
+layout_mode = 2
+
+[node name="Restart" type="Button" parent="VBoxContainer/RestartConatiner" unique_id=597005886]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Restart ESP"
+
+[node name="LOG_LAST" type="Label" parent="VBoxContainer" unique_id=1598011227]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Last Recieved:"
+
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer" unique_id=1573485163]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer/CenterContainer" unique_id=177787827]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "3D simulashyon"
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=595290347]
+layout_mode = 2
+text = "THROTLE (TAKE NOTICE): "
+label_settings = SubResource("LabelSettings_dnola")
+
+[node name="Label2" type="Label" parent="VBoxContainer" unique_id=1545758142]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer" unique_id=164652563]
+layout_mode = 2
+placeholder_text = "Throttle Incremental Speed (int > 0)"
+
+[node name="Label3" type="Label" parent="VBoxContainer" unique_id=1854501534]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+
+[node name="LeaveContainer" type="CenterContainer" parent="VBoxContainer" unique_id=400880263]
+layout_mode = 2
+
+[node name="Restart" type="Button" parent="VBoxContainer/LeaveContainer" unique_id=1329181194]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "quit to menu"
+
+[node name="Timer" type="Timer" parent="." unique_id=1314471664]
+wait_time = 0.1
+autostart = true
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1072277074]
+script = ExtResource("2_5qn5x")
+
+[connection signal="toggled" from="VBoxContainer/CenterContainer2/CheckBox" to="." method="method_"]
+[connection signal="pressed" from="VBoxContainer/ConnectContainer/Connect" to="." method="Connect"]
+[connection signal="pressed" from="VBoxContainer/DisconnectContainer/Disconnect" to="." method="Disconnect"]
+[connection signal="pressed" from="VBoxContainer/RestartConatiner/Restart" to="." method="Restart_ESP"]
+[connection signal="pressed" from="VBoxContainer/CenterContainer/Button" to="." method="eed"]
+[connection signal="text_submitted" from="VBoxContainer/LineEdit" to="." method="yes"]
+[connection signal="pressed" from="VBoxContainer/LeaveContainer/Restart" to="." method="quit_to_menu"]
+[connection signal="timeout" from="Timer" to="." method="process_packet"]

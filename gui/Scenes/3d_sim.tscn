@@ -1,28 +1,148 @@
 [gd_scene format=3 uid="uid://bj5x8hd4cftm1"]
 
-[ext_resource type="Script" uid="uid://vxara2ga34q6" path="res://Scripts/3d_sim.gd" id="1_3t3wq"]
-[ext_resource type="PackedScene" uid="uid://cdbdotldokbn8" path="res://Assets/Double Wobble.glb" id="2_05osm"]
+[ext_resource type="Script" uid="uid://c5q7ixogivglv" path="res://Scripts/Main.gd" id="1_l5hb7"]
+[ext_resource type="Script" uid="uid://dd1nmmjk1p64w" path="res://Scenes/character_body_2d.gd" id="2_qbk8w"]
 
-[node name="3D-Sim" type="Node3D" unique_id=1688245637]
-script = ExtResource("1_3t3wq")
+[sub_resource type="LabelSettings" id="LabelSettings_6yyo6"]
+font_size = 32
 
-[node name="aaaa" type="CharacterBody3D" parent="." unique_id=1282535575]
+[sub_resource type="LabelSettings" id="LabelSettings_dnola"]
+font_size = 32
 
-[node name="Node3D" type="Node3D" parent="aaaa" unique_id=55835993]
+[node name="Control" type="Control" unique_id=2043189975]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_l5hb7")
 
-[node name="Tinkercad GLTF Scene" parent="aaaa" unique_id=1802052423 instance=ExtResource("2_05osm")]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
-rotation_edit_mode = 1
+[node name="LiveVideo" type="CenterContainer" parent="." unique_id=872869492]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1543733426]
-transform = Transform3D(0.049415797, -0.326544, 0.9438894, 0, 0.9450439, 0.32694343, -0.9987783, -0.01615617, 0.046700098, 2.3163939, 0.95272326, 0.075509965)
+[node name="ColorRect" type="ColorRect" parent="LiveVideo" unique_id=342755644]
+custom_minimum_size = Vector2(1280, 720)
+layout_mode = 2
+color = Color(0, 0, 0, 1)
 
-[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=2145462399]
-transform = Transform3D(0.92215264, -0.3811481, -0.06603658, 0.3179809, 0.6496915, 0.69049925, -0.22027907, -0.657744, 0.7203125, 0, 18.831633, 20.060757)
-light_color = Color(0.8474515, 0, 0.45545793, 1)
-light_energy = 16.0
+[node name="Label" type="Label" parent="LiveVideo" unique_id=1164516536]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Live Video Feed will be Displayed here"
 
-[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1337607483]
-transform = Transform3D(1, 0, 0, 0, 0.98282623, -0.18453375, 0, 0.18453375, 0.98282623, 0.12841702, 2.681352, -0.2055099)
-light_color = Color(0.28028405, 0.5480923, 1, 1)
-light_size = 1.0
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=812366602]
+layout_mode = 0
+offset_left = 1300.0
+offset_top = 20.0
+offset_right = 1900.0
+offset_bottom = 720.0
+offset_transform_enabled = true
+accessibility_region = true
+
+[node name="MainLabel" type="Label" parent="VBoxContainer" unique_id=284449276]
+layout_mode = 2
+text = "Networking Information"
+label_settings = SubResource("LabelSettings_6yyo6")
+horizontal_alignment = 1
+
+[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer" unique_id=2009549101]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+offset_transform_enabled = true
+
+[node name="CheckBox" type="CheckBox" parent="VBoxContainer/CenterContainer2" unique_id=1068130443]
+custom_minimum_size = Vector2(300, 64)
+layout_mode = 2
+text = "Use Controller"
+icon_alignment = 2
+expand_icon = true
+
+[node name="ConnectContainer" type="CenterContainer" parent="VBoxContainer" unique_id=1470112807]
+layout_mode = 2
+
+[node name="Connect" type="Button" parent="VBoxContainer/ConnectContainer" unique_id=2142073138]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Start Server"
+
+[node name="DisconnectContainer" type="CenterContainer" parent="VBoxContainer" unique_id=747881956]
+layout_mode = 2
+
+[node name="Disconnect" type="Button" parent="VBoxContainer/DisconnectContainer" unique_id=179641153]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Stop Server"
+
+[node name="RestartConatiner" type="CenterContainer" parent="VBoxContainer" unique_id=770270331]
+layout_mode = 2
+
+[node name="Restart" type="Button" parent="VBoxContainer/RestartConatiner" unique_id=597005886]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Restart ESP"
+
+[node name="LOG_LAST" type="Label" parent="VBoxContainer" unique_id=1598011227]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Last Recieved:"
+
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer" unique_id=1573485163]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer/CenterContainer" unique_id=177787827]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "3D simulashyon"
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=595290347]
+layout_mode = 2
+text = "THROTLE (TAKE NOTICE): "
+label_settings = SubResource("LabelSettings_dnola")
+
+[node name="Label2" type="Label" parent="VBoxContainer" unique_id=1545758142]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer" unique_id=164652563]
+layout_mode = 2
+placeholder_text = "Throttle Incremental Speed (int > 0)"
+
+[node name="Label3" type="Label" parent="VBoxContainer" unique_id=1854501534]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+
+[node name="LeaveContainer" type="CenterContainer" parent="VBoxContainer" unique_id=400880263]
+layout_mode = 2
+
+[node name="Restart" type="Button" parent="VBoxContainer/LeaveContainer" unique_id=1329181194]
+custom_minimum_size = Vector2(260, 0)
+custom_maximum_size = Vector2(260, -1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "quit to menu"
+
+[node name="Timer" type="Timer" parent="." unique_id=1314471664]
+wait_time = 0.1
+autostart = true
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1072277074]
+script = ExtResource("2_qbk8w")
+
+[connection signal="toggled" from="VBoxContainer/CenterContainer2/CheckBox" to="." method="method_"]
+[connection signal="pressed" from="VBoxContainer/ConnectContainer/Connect" to="." method="Connect"]
+[connection signal="pressed" from="VBoxContainer/DisconnectContainer/Disconnect" to="." method="Disconnect"]
+[connection signal="pressed" from="VBoxContainer/RestartConatiner/Restart" to="." method="Restart_ESP"]
+[connection signal="pressed" from="VBoxContainer/CenterContainer/Button" to="." method="eed"]
+[connection signal="text_submitted" from="VBoxContainer/LineEdit" to="." method="yes"]
+[connection signal="pressed" from="VBoxContainer/LeaveContainer/Restart" to="." method="quit_to_menu"]
+[connection signal="timeout" from="Timer" to="." method="process_packet"]

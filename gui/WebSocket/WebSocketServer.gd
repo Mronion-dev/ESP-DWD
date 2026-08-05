@@ -41,6 +41,7 @@ func Connect(InputMethod : bool):
 		push_error("Unable to start server.")
 		Connected = false
 		set_process(false)
+	get_tree().set_auto_accept_quit(false)
 
 func Disconnect():
 	if !connectable:
@@ -126,3 +127,8 @@ func Inputs():
 func Send_Custom(text : String):
 	if connectable:
 		_peers[last_peer_id].send_text(text)
+
+func _notification(what: int) -> void:
+	# Check if the notification is a window close request
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		Send_Custom("closing")
