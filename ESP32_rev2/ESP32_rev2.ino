@@ -13,6 +13,7 @@
 #include <WiFi.h>
 #include <ArduinoWebsockets.h>
 #include <HTTPClient.h>
+#include <WebServer.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <ICM_20948.h>
@@ -20,6 +21,7 @@
 #include <MD_MAX72xx.h>
 #include <ESP32Servo.h>
 #include <WiFiUdp.h>
+#include <Preferences.h>
 
 Servo servoLeft;
 Servo servoRight;
@@ -42,6 +44,8 @@ float gxr;
 float gyr;
 float gzr;
 
+Preferences preferences;
+
 using namespace websockets;
 WebsocketsClient client;
 
@@ -55,8 +59,51 @@ const uint16_t DISCOVERY_PORT = 42100;
 const uint16_t Port = 54732; // Port that the godot server uses
 bool connected = false;
 
-void setup_AP(){
+WebServer server(80);
 
+void save(String SSID, String PASS, bool OK) {
+    preferences.begin("wifi", false);
+
+    preferences.putString("SSID", SSID);
+    preferences.putString("PASS", PASS);
+    preferences.putBool("OK", OK)
+
+    preferences.end();
+
+void handleSend() {
+    if (server.hasArg("str1") && server.hasArg("str2")) {
+        String message = server.arg("str1");
+        String message2 = server.arg("str2");
+
+        Serial.print("Received SSID: ");
+        Serial.println(message);
+        Serial.print("Recieved Password:");
+        Serial.println(message2);
+        save(message,message2,true);
+        ESP.restart();
+
+        server.send(200, "text/plain", "Received: " + message);
+    } else {
+        server.send(400, "text/plain", "Missing msg parameter");
+        save("","",false);
+    }
+}
+
+void setup_AP() {
+
+    // Start Wi-Fi access point
+    WiFi.softAP(ssid, password);
+
+    Serial.println("AP started");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.softAPIP());
+
+    // HTTP endpoint
+    server.on("/send", handleSend);
+
+    server.begin();
+
+    Serial.println("HTTP server started");
 }
 
 //I2C com with IMU board
@@ -248,6 +295,16 @@ void setup() {
   matrix.control(MD_MAX72XX::INTENSITY, 5);
   matrix.clear();
   Serial.begin(115200);
+  preferences.begin("wifi", true);
+  ssid = preferences.getString("SSID", "");
+  password = preferences.getString("PASS", "");
+  if (preferences.getBool("OK",false) == false){
+    setup_AP();
+    while(true){
+      handleSend();
+    }
+  }
+  preferences.end()
   WiFi.begin(ssid, password);
 
   uint32_t lastAnimation = 0;
@@ -255,7 +312,6 @@ void setup() {
   int wait_count = 0;
   while (WiFi.status() != WL_CONNECTED)
   {
-    
     if (millis() - lastAnimation >= 50
     )
     {
@@ -315,6 +371,12 @@ void setup() {
     if(shit == "rest") {
       Serial.println("requested restart");
       flashX(4,50,50);
+      ESP.restart();
+    }
+    if(shit == "RESET") {
+      Serial.println("requested factory defaults");
+      flashX(5,200,50);
+      save("","",false);
       ESP.restart();
     }
     float leftX;
