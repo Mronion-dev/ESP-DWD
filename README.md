@@ -1,3 +1,4 @@
+## **NOTE THAT SOME OF THIS IS OUTDATED AND WAS A PART OF AN OLDER VERSION OF THE DRONE !!**
 # DWDC — Double Wobble Drone
 
 **DWDC (Double Wobble Drone Controller)** is an open-source budget drone project that includes:
