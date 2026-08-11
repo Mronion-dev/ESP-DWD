@@ -132,3 +132,4 @@ func _notification(what: int) -> void:
 	# Check if the notification is a window close request
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		Send_Custom("closing")
+		get_tree().quit()
