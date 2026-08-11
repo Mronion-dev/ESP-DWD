@@ -18,7 +18,7 @@
 #include <SPI.h>
 #include <ICM_20948.h>
 #include <MadgwickAHRS.h>
-#include <MD_MAX72xx.h>
+#include <MD_MAX72xx.h> //!!FOR DEBUGGING PURPOSES ONLY, NOT REQUIRED!!
 #include <ESP32Servo.h>
 #include <WiFiUdp.h>
 #include <Preferences.h>
@@ -123,7 +123,6 @@ void setup_IMU(){
 
     escLeft.writeMicroseconds(1000);
     escRight.writeMicroseconds(1000);
-    Draw_repetition();
     delay(5000);
 
     Wire.begin(21, 22);
@@ -199,16 +198,6 @@ void Draw_Check(){
   matrix.setPoint(5,5,true);
   matrix.setPoint(6,4,true);
   matrix.setPoint(7,3,true);
-}
-
-void Draw_repetition(){
-  for(int b = 0; b == 7; b++){
-    for(int c = 3; c == 5; c++){
-      matrix.setPoint(c, b, true);
-      delay(40);
-      matrix.clear();
-    }
-  }
 }
 
 void flashX(uint8_t flashes = 6, uint16_t onTime = 200, uint16_t offTime = 200)
