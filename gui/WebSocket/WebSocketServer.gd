@@ -81,9 +81,7 @@ func _process(delta):
 	# Iterate over all connected peers using "keys()" so we can erase in the loop
 	for peer_id in _peers.keys():
 		var peer = _peers[peer_id]
-
 		peer.poll()
-
 		var peer_state = peer.get_ready_state()
 		if peer_state == WebSocketPeer.STATE_OPEN:
 			connectable = true

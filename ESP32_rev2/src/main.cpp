@@ -248,7 +248,7 @@ float throttle = 1000.0f; // ESC pulse width in µs
 
 float delta;
 
-void updateThrottle(int rightY)
+void updateThrottle(int rightY, int leftX = 0)
 {
     escLeft.writeMicroseconds(rightY);
     escRight.writeMicroseconds(rightY);
@@ -389,7 +389,6 @@ void setup() {
     float leftY;
     float rightX;
     int rightY;
-    matrix.setPoint(7,0,true);
     if(parseControllerInput(shit, leftY, rightX, leftX , rightY) == true){
       float servoOffset = (leftY - 1.0f) * 20.0f;
       
@@ -399,11 +398,9 @@ void setup() {
       leftAngle  = constrain(leftAngle, 70, 110);
       rightAngle = constrain(rightAngle, 70, 110);
 
-      updateThrottle(rightY);
-      Serial.println(rightY);
+      updateThrottle(rightY + (int)(servoOffset) * 5 + (int)(leftY * 10.0f));
       servoLeft.write(leftAngle);
       servoRight.write(rightAngle);
-      matrix.setPoint(0,7,true);
     }
       
   });

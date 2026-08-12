@@ -5,8 +5,8 @@
 
 - Semi-Complete drone-side code
 - Serial monitor to arduino controller code `Deprecated`
-- 3D printable files for the drone frame and mounting parts `Unfinished`
-- (almost) All required design files to build the project from scratch `Unfinished`
+- 3D printable files for the drone frame and mounting parts `needs improvment`
+- (almost) All required design files to build the project from scratch `Not Done`
 
 The goal of this project is to provide a simple and affordable drone platform that anyone can build at home using commonly available components.
 
