@@ -248,10 +248,10 @@ float throttle = 1000.0f; // ESC pulse width in µs
 
 float delta;
 
-void updateThrottle(int rightY, int leftX = 0)
+void updateThrottle(int rightY, int leftX)
 {
-    escLeft.writeMicroseconds(rightY);
-    escRight.writeMicroseconds(rightY);
+    escLeft.writeMicroseconds(rightY - leftX);
+    escRight.writeMicroseconds(rightY + leftX);
 }
 
 float biasX = 0;
@@ -346,12 +346,6 @@ void setup() {
   Serial.print("Gateway (Router IP): ");
   Serial.println(WiFi.gatewayIP()); // Get router's IP address
 
-  setup_IMU();
-  filter.begin(100.0f);
-  Serial.println("IMU connected succesfully");
-  calibrateGyro();
-  Serial.println("IMU calibrated!");
-
   //Sends an http packet to a flask server and asks for the requested IP to connect to
   Serial.println("Sending WHO_AM_I request to flask server on http://192.168.10.35:5000 ");
   
@@ -365,6 +359,12 @@ void setup() {
     connected = true;
   }
 
+  setup_IMU();
+  Serial.println("IMU connected succesfully");
+  calibrateGyro();
+  Serial.println("IMU calibrated!");
+  filter.begin(100.0f);
+  
   client.onMessage([](WebsocketsMessage msg) {
     String shit = String(msg.data());
     if(shit == "closing") {
@@ -398,7 +398,7 @@ void setup() {
       leftAngle  = constrain(leftAngle, 70, 110);
       rightAngle = constrain(rightAngle, 70, 110);
 
-      updateThrottle(rightY + (int)(servoOffset) * 5 + (int)(leftY * 10.0f));
+      updateThrottle(rightY + (int)(servoOffset) * 5 + (int)((leftY - 1.0f) * 10.0f), (int)((leftX - 1.0f) * 20.0f));
       servoLeft.write(leftAngle);
       servoRight.write(rightAngle);
     }
@@ -420,7 +420,7 @@ void loop() {
       ESP.restart();
     }
     uint32_t now = micros();
-    delta = (now - lastTime) / 1000000.0f;
+    delta = (now - lastTime) / 1000000.0f; //delta is saved as seconds 
     lastTime = now;
     client.poll();
     if (imu.dataReady())
@@ -443,20 +443,10 @@ void loop() {
       float qx = filter.q1;
       float qy = filter.q2;
       float qz = filter.q3;
-      gxr += gx * delta;
-      gyr += gy * delta;
-      gzr += gz * delta;
 
       client.send(String(qw, 3) + " " + String(qx, 3) + " " + String(qy, 3) + " " + String(qz, 3));
-
-      matrix.clear();
-      if(t % 2 == 0){
-        matrix.clear();
-        matrix.setPoint(t/2,t/2,true);
-      }
-      t += 1;
-      if(t == 15){
-        t = 0;
+      if(delta < 0.00000001f) {
+        delayMicroseconds(10000 - (int)(delta * 1000000.0f));
       }
     }
 }
