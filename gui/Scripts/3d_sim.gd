@@ -19,7 +19,7 @@ func _process(delta: float) -> void:
 	if Websocket.Last_logged.split(" ").size() < 2:
 		return
 	var quat = Websocket.Last_logged.split(" ")
-	$"aaaa/Tinkercad GLTF Scene".quaternion = Quaternion(quat[1].to_float(), quat[2].to_float(), quat[3].to_float(), quat[0].to_float())
+	$"cat orb".quaternion = Quaternion(quat[1].to_float(), quat[2].to_float(), quat[3].to_float(), quat[0].to_float())
 	if Input.is_action_pressed("ui_cancel"):
 		get_tree().change_scene_to_file("res://Scenes/Main.tscn")
 	pass

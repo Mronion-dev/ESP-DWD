@@ -44,6 +44,16 @@ float gxr;
 float gyr;
 float gzr;
 
+
+float servoOffset;    
+int leftAngle;
+int rightAngle;
+
+float leftX;
+float leftY;
+float rightX;
+int rightY;
+
 Preferences preferences;
 
 using namespace websockets;
@@ -248,15 +258,28 @@ float throttle = 1000.0f; // ESC pulse width in µs
 
 float delta;
 
-void updateThrottle(int rightY, int leftX)
-{
-    escLeft.writeMicroseconds(rightY - leftX);
-    escRight.writeMicroseconds(rightY + leftX);
-}
-
 float biasX = 0;
 float biasY = 0;
 float biasZ = 0;
+
+void Stabalize(float roll, float pitch)
+{
+  float error = leftX * 60 - roll;
+
+  int Kp = 10;
+  int Kd = 0;
+
+  float correction = Kp * error - Kd * (imu.gyrX() - biasX);
+  
+  updateThrottle((int)round(rightY - correction), (int)round(rightY + correction));
+}
+
+void updateThrottle(int right, int left)
+{
+    escLeft.writeMicroseconds(constrain(left, 1000, 2000));
+    escRight.writeMicroseconds(constrain(right, 1000, 2000));
+}
+
 
 void calibrateGyro() //creates a bias to subtract from the imu values, reduce shaking and drifings
 {
@@ -278,6 +301,20 @@ void calibrateGyro() //creates a bias to subtract from the imu values, reduce sh
     biasX /= samples;
     biasY /= samples;
     biasZ /= samples;
+}
+
+void print(String serial){
+  if(!Serial){
+    return;
+  }
+  Serial.print(serial);
+}
+
+void println(String serialln){
+  if(!Serial){
+    return;
+  }
+  Serial.println(serialln);
 }
 
 //This runs when the ESP32 boots
@@ -306,7 +343,7 @@ void setup() {
             HTTPserver.handleClient();
         }
 
-        Serial.println("Eat shit");
+        println("Eat input");
         ESP.restart();
     }
 
@@ -340,19 +377,16 @@ void setup() {
   matrix.clear();
   Draw_Check();
   delay(100);
-  Serial.println("Connected to Wi-Fi");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("Gateway (Router IP): ");
-  Serial.println(WiFi.gatewayIP()); // Get router's IP address
-
-  //Sends an http packet to a flask server and asks for the requested IP to connect to
-  Serial.println("Sending WHO_AM_I request to flask server on http://192.168.10.35:5000 ");
+  println("Connected to Wi-Fi");
+  print("IP Address: ");
+  println(WiFi.localIP());
+  print("Gateway (Router IP): ");
+  println(WiFi.gatewayIP()); // Get router's IP address
   
   //Connect to the Websocket safely and handle timeouts
   if(connect_to_server() == false){
     connected = false;
-    Serial.println("connection failed, stopping and reseting esp...");
+    println("connection failed, stopping and reseting esp...");
     ESP.restart();
   }
   else{
@@ -360,45 +394,41 @@ void setup() {
   }
 
   setup_IMU();
-  Serial.println("IMU connected succesfully");
+  println("IMU connected succesfully");
   calibrateGyro();
-  Serial.println("IMU calibrated!");
+  println("IMU calibrated!");
   filter.begin(100.0f);
   
   client.onMessage([](WebsocketsMessage msg) {
-    String shit = String(msg.data());
-    if(shit == "closing") {
-      Serial.println("Server is off, pleas restart the esp32 to reconnect");
+    String input = String(msg.data());
+
+    if(input == "closing") {
+      println("Server is off, pleas restart the esp32 to reconnect");
       while(true) {
         flashX();
-        
       }
     }
-    if(shit == "rest") {
-      Serial.println("requested restart");
+
+    if(input == "rest") {
+      println("requested restart");
       flashX(4,50,50);
       ESP.restart();
     }
-    if(shit == "RESET") {
-      Serial.println("requested factory defaults");
+
+    if(input == "RESET") {
+      println("requested factory defaults");
       flashX(5,200,50);
       save("","",false);
       ESP.restart();
     }
-    float leftX;
-    float leftY;
-    float rightX;
-    int rightY;
-    if(parseControllerInput(shit, leftY, rightX, leftX , rightY) == true){
-      float servoOffset = (leftY - 1.0f) * 20.0f;
-      
-      int leftAngle  = (int)(90.0f + servoOffset);
-      int rightAngle = (int)(90.0f - servoOffset);
+
+    if(parseControllerInput(input, leftX, leftY, rightX , rightY) == true){
 
       leftAngle  = constrain(leftAngle, 70, 110);
       rightAngle = constrain(rightAngle, 70, 110);
 
       updateThrottle(rightY + (int)(servoOffset) * 5 + (int)((leftY - 1.0f) * 10.0f), (int)((leftX - 1.0f) * 20.0f));
+
       servoLeft.write(leftAngle);
       servoRight.write(rightAngle);
     }
@@ -411,42 +441,49 @@ int t = 0;
 int angle = 0;
 
 void loop() {
-    if(connected == false) {
-      return;
+  if(connected == false) {
+    return;
+  }
+
+  if(digitalRead(15) == LOW){
+    Serial.println("reseting physically");
+    save("","",false);
+    ESP.restart();
+  }
+
+  uint32_t now = micros();
+  delta = (now - lastTime) / 1000000.0f; //delta is saved as seconds 
+  lastTime = now;
+
+  client.poll();
+
+  if (imu.dataReady())
+  {
+    imu.getAGMT();
+
+    float gx = imu.gyrX() - biasX;
+    float gy = imu.gyrY() - biasY;
+    float gz = imu.gyrZ() - biasZ;
+
+    float ax = imu.accX() / 1000.0f;
+    float ay = imu.accY() / 1000.0f;
+    float az = imu.accZ() / 1000.0f;
+
+    filter.updateIMU(
+      gx, gy, gz,
+      ax, ay, az
+    );
+
+    float qw = filter.q0;
+    float qx = filter.q1;
+    float qy = filter.q2;
+    float qz = filter.q3;
+
+    client.send(String(qw, 3) + " " + String(qx, 3) + " " + String(qy, 3) + " " + String(qz, 3));
+    if(delta < 0.00000001f) {
+      delayMicroseconds(10000 - (int)(delta * 1000000.0f));
     }
-    if(digitalRead(15) == LOW){
-      Serial.println("reseting physically");
-      save("","",false);
-      ESP.restart();
-    }
-    uint32_t now = micros();
-    delta = (now - lastTime) / 1000000.0f; //delta is saved as seconds 
-    lastTime = now;
-    client.poll();
-    if (imu.dataReady())
-    {
-      imu.getAGMT();
 
-      float gx = imu.gyrX() - biasX;
-      float gy = imu.gyrY() - biasY;
-      float gz = imu.gyrZ() - biasZ;
-
-      float ax = imu.accX() / 1000.0f;
-      float ay = imu.accY() / 1000.0f;
-      float az = imu.accZ() / 1000.0f;
-
-      filter.updateIMU(
-        gx, gy, gz,
-        ax, ay, az
-      );
-      float qw = filter.q0;
-      float qx = filter.q1;
-      float qy = filter.q2;
-      float qz = filter.q3;
-
-      client.send(String(qw, 3) + " " + String(qx, 3) + " " + String(qy, 3) + " " + String(qz, 3));
-      if(delta < 0.00000001f) {
-        delayMicroseconds(10000 - (int)(delta * 1000000.0f));
-      }
-    }
+    Stabalize(filter.roll, filter.pitch);
+  }
 }
